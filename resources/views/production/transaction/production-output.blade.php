@@ -100,6 +100,7 @@ foreach ($user_accesses as $user_access){
     <script type="text/javascript">
         var getOutputsURL = "{{ url('/prod/production-output/get-output') }}";
         var deleteProductonOutput = "{{ url('/prod/production-output/destroy') }}";
+        var editProdOutput = "{{ url('/prod/production-output/edit-prod_output') }}"; 
         var getOperatorURl = "{{ url('/prod/production-output/get-Operator') }}"; 
         var getOperatorNameURL = "{{ url('/prod/production-output/get-Operatorname') }}";    
         var checkSequence = "{{ url('/prod/production-output/check-Sequence') }}";

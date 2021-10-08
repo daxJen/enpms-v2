@@ -1,10 +1,13 @@
 var prod_output_arr = [];
 var searched_jo_arr = [];
+var tag_update = 0;
 $(function () {
   makeSearchTable(searched_jo_arr);
   checkAllCheckboxesInTable('.check_all', '.check_item');
   init();
+
   $('#tbl_searched_jo_body').on('click', '.btn_edit_travel_sheet', function () {
+    clear();
     $('#travel_sheet_process_id').val($(this).attr('data-id'));
     $('#travel_sheet_id').val($(this).attr('data-travel_sheet_id'));
     $('#jo_sequence').val($(this).attr('data-jo_sequence'));
@@ -25,7 +28,7 @@ $(function () {
     getTransferQty($(this).attr('data-id'));
     $('.loadingOverlay-modal').show();
     getOutputs($(this).attr('data-id'));
-
+    tag_update = 0;
     if ($(this).attr('data-unprocessed') > 0) {
       $('#btn_save_output').prop('disabled', false);
     } else {
@@ -33,11 +36,12 @@ $(function () {
     }
 
     $('#modal_production_output').modal('show');
+    $('#btn_update').prop('disabled', true);
   });
   $('#tbl_production_ouput_body').on('click', '.btn_delete_set', function () {
    var travel_sheet_process_id = $(this).attr('data-travel_sheet_process_id');
    var id = $(this).val();
-  
+   
    var msgtext = "You will not be able to recover your data.";
 
     swal({
@@ -76,52 +80,123 @@ $(function () {
             swal("Cancelled", "Your data is safe and not deleted.");
       }
       });
-      // id = $(this).attr('data-travel_sheet_process_id');
-
-      // $.ajax({
-      //   url: checkSequence,
-      //   type: 'POST',
-      //   dataType: 'JSON',
-      //   data: {
-      //     _token: token,
-      //     id: id
-      //   }
-      // }).done(function (data, textStatus, xhr) {
-      //   if (data.status == 'success') {
-          // delete_set();
-      //     // msg('under construction', 'failed');
-      //   } else {
-      //     msg('The quantity already done or ongoing to other processes', 'failed');
-      //   }
-      // }).fail(function (xhr, textStatus, errorThrown) {
-      //   ErrorMsg(xhr);
-      // });
     
   });
   $('#tbl_production_ouput_body').on('click', '.btn_edit_set', function () {
     var id;
       id = $(this).attr('data-travel_sheet_process_id');
-    
-      $.ajax({
-        url: checkSequence,
-        type: 'POST',
-        dataType: 'JSON',
-        data: {
-          _token: token,
-          id: id
-        }
-      }).done(function (data, textStatus, xhr) {
-        if (data.status == 'success') {
-          // edit_set();
-          msg('under construction', 'failed');
-        } else {
-          msg('The quantity already done or ongoing to other processes', 'failed');
-        }
-      }).fail(function (xhr, textStatus, errorThrown) {
-        ErrorMsg(xhr);
+      $('#operator').val($(this).attr('data-operator'));
+      $('#operator_name').val($(this).attr('data-operator_name'));
+      $('#machine_no').val($(this).attr('data-machine_no'));
+      $('#unprocessed').val($(this).attr('data-unprocessed'));
+      $('#good').val($(this).attr('data-good'));
+      $('#scrap').val($(this).attr('data-scrap'));
+      $('#rework').val($(this).attr('data-rework'));
+      $('#nc').val($(this).attr('data-reworked'));
+      $('#conver').val($(this).attr('data-convert'));
+      $('#alloy_mix').val($(this).attr('data-alloy_mix'));
+      $('#btn_save_output').prop('disabled',true);
+      $('#btn_update').prop('disabled',false);
+      tag_update = 1;
+ 
+  });
+  
+  $('#btn_update').on('click', function (e) {
+    var id;
+      id = $(this).attr('data-travel_sheet_process_id');
+      $('#operator').val($(this).attr('data-operator'));
+      $('#operator_name').val($(this).attr('data-operator_name'));
+      $('#machine_no').val($(this).attr('data-machine_no'));
+      $('#unprocessed').val($(this).attr('data-unprocessed'));
+      $('#good').val($(this).attr('data-good'));
+      $('#scrap').val($(this).attr('data-scrap'));
+      $('#rework').val($(this).attr('data-rework'));
+      $('#nc').val($(this).attr('data-reworked'));
+      $('#conver').val($(this).attr('data-convert'));
+      $('#alloy_mix').val($(this).attr('data-alloy_mix'));
+      $('#btn_save_output').prop('disabled',true);
+      $('#btn_update').prop('disabled',false);
+      tag_update = 1;
+
+
+    var msgtext = "You want to edit/modify your data.";
+
+    swal({
+        title: "Are you sure?",
+        text: msgtext,
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#f95454",
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        closeOnConfirm: true,
+        closeOnCancel: false
+    }, function(isConfirm){
+        if (isConfirm) {
+          $('.loadingOverlay').show();
+           $.ajax({
+              url: editProdOutput,
+              type: 'POST',
+              dataType: 'JSON',
+              data: {
+                id: id,
+                travel_sheet_process_id: travel_sheet_process_id,
+                operator: operator,
+                operator_name: operator_name,
+                machine_no: machine_no,
+                unprocessed: unprocessed,
+                good: good,
+                rework: rework,
+                scrap: scrap,
+                nc: nc,
+                conver: conver,
+                alloy_mix: alloy_mix
+              }
+            }).done(function (data, textStatus, xhr) {
+              msg("Production Output was successfully edited.", 'success');
+              $('#unprocessed').val(data.unprocessed);
+              getOutputs($('#travel_sheet_process_id').val());
+              searched_jo_arr = [];
+              searched_jo_arr = data.travel_sheet;
+              makeSearchTable(searched_jo_arr);
+              clear();
+            }).fail(function (xhr, textStatus, errorThrown) {
+              ErrorMsg(xhr);
+            });
+       } else {
+            swal("Cancelled", "No changes has been made.");
+      }
       });
     
   });
+  $('#btn_refresh').on('click', function (e) {
+    $('#operator').val('');
+    $('#operator_name').val('');
+    $('#machine_no').val('');
+    $('#unprocessed').val(0);
+    $('#good').val(0);
+    $('#rework').val(0);
+    $('#scrap').val(0);
+    $('#nc').val(0);
+    $('#conver').val(0);
+    $('#alloy_mix').val(0);
+    $('#btn_save_output').prop('disabled',false);
+    $('#btn_update').prop('disabled',true);
+    tag_update = 0;
+
+
+
+    if ($(this).attr('data-unprocessed') > 0) {
+      $('#btn_save_output').prop('disabled', false);
+    } else {
+      $('#btn_save_output').prop('disabled', true);
+    }
+  });
+  
+  function clear_state() {
+  $('.clear').val('');
+  }
+
   $('#frm_search_jo').on('submit', function (e) {
     e.preventDefault();
     $('.loadingOverlay').show();
@@ -162,7 +237,11 @@ $(function () {
     if (parseInt($('#unprocessed').val()) == unprocessed) {
       msg('Please put some value on quantity entries.', 'warning');
     } else if (unprocessed < 0 && $('#current_process').val() !== 'CUTTING') {
-      msg("Please Input less than unprocessed", "warning");
+      if (tag_update = 1) {
+
+      }else{
+        msg("Please Input less than unprocessed", "warning");
+      }
     } else if (qtyTransfer > 0) {
       msg("The process has a pending Transfer Item of " + qtyTransfer, "warning");
     } else if ($('#good').val() < 0 || $('#scrap').val() < 0 || $('#rework').val() < 0 || $('#nc').val() < 0 || $('#alloy_mix').val() < 0 || $('#conver').val() < 0) {
@@ -263,7 +342,11 @@ function deductUnprocessed(el_name, value) {
     unprocessed = unprocessed - (parseInt($('#rework').val()) + parseInt($('#scrap').val()) + parseInt($('#good').val()) + parseInt($('#nc').val()) + parseInt($('#conver').val()) + parseInt($('#alloy_mix').val()));
 
     if (unprocessed < 0 && $('#current_process').val() !== 'CUTTING') {
-      msg("Please Input less than unprocessed", "warning");
+      if (tag_update = 1){
+
+      }else {
+        msg("Please Input less than unprocessed", "warning");  
+      }
     }
   }
 }
@@ -311,27 +394,44 @@ function makeProdOutputTable(arr) {
             "data-id='" + x.id + "'" +
             "data-row='" + row + "'" +
             "'data-travel_sheet_id='" + x.travel_sheet_id + 
-            "'data-travel_sheet_process_id='" + x.travel_sheet_process_id + 
+            "'data-travel_sheet_process_id='" + x.travel_sheet_process_id +
+            "'data-unprocessed='" + x.unprocessed + 
+            "'data-good='" + x.good + 
+            "'data-rework='" + x.rework +
+            "'data-scrap='" + x.scrap +
+            "'data-reworked='" + x.nc +
+            "'data-convert='" + x.conver +
+            "'data-alloy_mix='" + x.alloy_mix +
+            "'data-operator='" + x.operator +
+            "'data-operator_name='" + x.operator_name +
+            "'data-machine_no='" + x.machine_no +        
             "'value='" + x.id + "'>" + 
             "<i class='fa fa-edit'></i>" +
             "</button>" + " " +
 
-            "<button type='button' class='btn btn-lg bg-red btn_delete_set' data-row='" + 
+            "<button type='button' class='btn btn-lg bg-red btn_delete_set' " + 
             "'data-id='" + x.id + 
             "'data-row='" + row + "'" +
             "'data-travel_sheet_id='" + x.travel_sheet_id + 
             "'data-travel_sheet_process_id='" + x.travel_sheet_process_id + 
-            "'data-issued_qty='" + x.issued_qty + 
+            "'data-unprocessed='" + x.unprocessed + 
+            "'data-good='" + x.good + 
+            "'data-rework='" + x.rework +
+            "'data-scrap='" + x.scrap +
+            "'data-reworked='" + x.nc +
+            "'data-convert='" + x.conver +
+            "'data-alloy_mix='" + x.alloy_mix +
+            "'data-operator='" + x.operator +
+            "'data-operator_name='" + x.operator_name +
+            "'data-machine_no='" + x.machine_no +   
             "'value='" + x.id + "'>" + 
             "<i class='fa fa-times'></i>" +
-            "</button>" ;
+            "</button>";
       },
 
       searchable: false,
       orderable: false,
       width: '3.33%'
-    
-      // { data: 'action', name: 'action', searchable: false, orderable: false, width: '3.33%'
       
     }, {
       data: 'unprocessed'
@@ -353,6 +453,10 @@ function makeProdOutputTable(arr) {
       data: 'process_date'
     }, {
       data: 'operator_name'
+    }, {
+      data: 'operator'
+    }, {
+      data: 'machine_no'
     }],
     fnInitComplete: function fnInitComplete() {
       $('.loadingOverlay-modal').hide();

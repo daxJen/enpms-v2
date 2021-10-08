@@ -46,6 +46,7 @@ class ProductionOutputController extends Controller
 
     public function store(Request $req)
     {
+
         $error = ['errors' => ['operator' => 'Operator ID is not yet registered.']];
         $check = PpcOperator::where('operator_id',$req->operator)->count();
         if ($check == 0) { 
@@ -375,7 +376,9 @@ class ProductionOutputController extends Controller
                                         'nc',
                                         DB::raw("(`good`+`rework`+`scrap`+`conver`+`alloy_mix`+`nc`) as total"),
                                         DB::raw("ifnull(process_date,updated_at) as process_date"),
-                                        'operator_name'
+                                        'operator_name',
+                                        'operator',
+                                        'machine_no'
                                     )->where('travel_sheet_process_id',$req->id)
                                     ->where('deleted',0)->get();
         return response()->json($data);
@@ -436,6 +439,28 @@ class ProductionOutputController extends Controller
             $data = DB::select(DB::raw("CALL PROD_delete_row(
                                         '". $req->id ."',
                                         '". $req->travel_sheet_process_id ."' )")
+                               );
+
+   
+        return response()->json($data);
+    }
+    public function editProdOutput(Request $req)
+    {
+       
+            $data = DB::select(DB::raw("CALL PROD_edit_row(
+                                        '". $req->id ."',
+                                        '". $req->travel_sheet_process_id ."',
+                                        '". $req->operator ."',
+                                        '". $req->operator_name ."',
+                                        '". $req->machine_no ."',
+                                        '". $req->unprocessed ."',
+                                        '". $req->good ."',
+                                        '". $req->rework ."',
+                                        '". $req->nc ."',
+                                        '". $req->scrap ."',
+                                        '". $req->conver ."',
+                                        '". $req->alloy_mix ."',
+                                         )")
                                );
 
    

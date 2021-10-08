@@ -517,6 +517,8 @@ Route::group(['prefix' => 'prod', 'middleware' => ['ajax-session-expired', 'auth
 			->name('prod.production-output.create');
 		Route::post('/destroy', 'Production\Transaction\ProductionOutputController@destroy')
 			->name('prod.production-output.destroy');
+		Route::post('/edit-prod_output', 'Production\Transaction\ProductionOutputController@editProdOutput')
+			->name('prod.production-output.edit-prod_output');
 		Route::post('/search-jo', 'Production\Transaction\ProductionOutputController@SearchJo')
 			->name('prod.production-output.search-jo');
 		Route::post('/get-Operator', 'Production\Transaction\ProductionOutputController@getOperator')

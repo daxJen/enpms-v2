@@ -362,6 +362,8 @@
 	                                <th>Total</th>
 	                                <th>Process Date/Time</th>
 	                                <th>Operator's Name</th>
+	                                <th>Operator id</th>
+	                                <th>Machine No</th>
 		                        </thead>
 		                        <tbody id="tbl_production_ouput_body"></tbody>
 		                    </table>
@@ -369,14 +371,14 @@
 		                    <div class="row justify-content-center">
 		                    	<div class="col-md-3">
 		                    		<button type="submit" id="btn_save_output" class="btn btn-sm btn-block bg-blue permission-button">
-		                    			<i class="fa fa-floppy-o"></i> Save
+		                    			<i class="fa fa-floppy-o"></i> SAVE
 		                    		</button>
 		                    	</div> </form>
-		                    	<!-- <div class="col-md-3">
-			                        <button type="button" id="btn_edit_set" class="btn bg-purple btn-block permission-button">
-			                            <i class="fa fa-edit"></i> Edit
+		                    	<div class="col-md-3">
+			                        <button type="button" id="btn_update" class="btn bg-purple btn-block permission-button">
+			                            <i class="fa fa-update"></i> Update
 			                        </button>
-			                    </div> -->
+			                    </div>
 		                    	<!-- <div class="col-md-3">
 		                    		<button type="button" id="btn_delete_set" class="btn btn-sm btn-block bg-red permission-button">
 		                    			<i class="fa fa-trash"></i> Delete
@@ -388,8 +390,10 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn bg-red" data-dismiss="modal">Close</button>
+                	<button type="button" id="btn_refresh" class="btn bg-green">Clear Entry</button>
                 </div>
-                	
+               
+                    
             </div>
        
     </div>
